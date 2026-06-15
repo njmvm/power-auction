@@ -196,14 +196,14 @@ function PlantBadge({ plant, size = 44 }) {
 
 function MeritOrder({ result, height = 240 }) {
   if (!result) return null;
-  const offered = result.entries.filter((e) => e.bid !== null && e.cap > 0)
-    .sort((a, b) => a.bid - b.bid || a.name.localeCompare(b.name));
+  const offered = result.entries.filter((e) => Number.isFinite(Number(e.bid)) && e.cap > 0)
+    .sort((a, b) => Number(a.bid) - Number(b.bid) || a.name.localeCompare(b.name));
   if (!offered.length) return null;
   const totalCap = offered.reduce((s, e) => s + e.cap, 0);
   const W = 760, H = height, padL = 46, padB = 34, padT = 26;
   const plotW = W - padL - 16;
-  const maxBid = Math.max(60, ...offered.map((e) => e.bid));
-  const span = maxBid - Math.min(0, ...offered.map((e) => e.bid)) || 1;
+  const maxBid = Math.max(60, ...offered.map((e) => Number(e.bid)));
+  const span = maxBid - Math.min(0, ...offered.map((e) => Number(e.bid))) || 1;
   const yOf = (v) => padT + ((maxBid - v) / span) * (H - padT - padB);
   const y0 = yOf(0);
   let cum = 0;
@@ -218,8 +218,8 @@ function MeritOrder({ result, height = 240 }) {
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
       <line x1={padL} x2={W - 10} y1={y0} y2={y0} stroke={C.line} strokeWidth="1.5" />
       {bars.map((b) => {
-        const top = Math.min(yOf(b.bid), y0);
-        const h = Math.max(3, Math.abs(yOf(b.bid) - y0));
+        const top = Math.min(yOf(Number(b.bid)), y0);
+        const h = Math.max(3, Math.abs(yOf(Number(b.bid)) - y0));
         const ran = b.dispatched > 0;
         return (
           <g key={b.pid}>
